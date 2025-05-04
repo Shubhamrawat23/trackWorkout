@@ -27,7 +27,7 @@ export default function Dashboard() {
             <hr className="w-[99%] mx-auto" />
             <div className="text-[1.5rem] px-1 text-black bg-white hover:bg-gray-300 w-[8rem] rounded-[20px] float-right my-[5px] cursor-pointer" onClick={handleNewTab}>+ New Tab</div>
 
-            <section className="flex my-[4rem] p-[2rem] px-4 flex-wrap h-[34.5em] overflow-y-scroll gap-28 justify-center">
+            <section className="flex my-[4rem] p-[2rem] px-4 flex-wrap h-[34.5em] overflow-y-auto gap-28 justify-center">
                 {
                     allTab?.map((value) => {
                         return (
@@ -60,5 +60,4 @@ export default function Dashboard() {
             </section>
         </div>
     )
-    
 }
