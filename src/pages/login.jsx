@@ -1,45 +1,81 @@
 import React from "react";
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+  Dialog,
+  DialogDescription,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useWktStore } from "@/store";
 
 
-export default function LogIn() {
+export default function LogIn({isOpen}) {
+    const toggleBox = useWktStore((state) => state.toggleLoginBox);
+    const toggleSignupBox = useWktStore((state) => state.toggleSignupBox)
+    
+    const signUpClick = () => {
+        toggleBox();
+        toggleSignupBox();
+    };
     return (
         <>
-            <Card className="w-[350px]">
-                <CardHeader>
-                    <CardTitle>Login</CardTitle>
-                    <CardDescription>Welcome Gym Buddy Lets Go.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form>
-                        <div className="grid w-full items-center gap-4 mb-3">
-                            <div className="flex flex-col space-y-1.5">
-                                <Label htmlFor="Email">Email</Label>
-                                <Input id="Email" placeholder="Your Email Buddy" />
-                            </div>
+            <Dialog open={isOpen} onOpenChange={toggleBox}>
+                <DialogContent className="sm:max-w-[400px]">
+                    <DialogHeader>
+                        <DialogTitle className="text-center text-xl font-semibold">
+                            Welcome Back 👋
+                        </DialogTitle>
+                        <DialogDescription className="text-center text-gray-500">
+                            Log in to continue your journey
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <form className="space-y-4 mt-4">
+                        <div>
+                            <Label htmlFor="loginEmail" className="my-2">Email</Label>
+                            <Input
+                                className="border-2"
+                                type="email"
+                                id="loginEmail"
+                                placeholder="you@example.com"
+                                autoComplete="on"
+                                required
+                            />
                         </div>
-                        <div className="grid w-full items-center gap-4">
-                            <div className="flex flex-col space-y-1.5">
-                                <Label htmlFor="Password">Password</Label>
-                                <Input id="Password" placeholder="Your Password Buddy" />
-                            </div>
+
+                        <div>
+                            <Label htmlFor="loginPass" className="my-2">Password</Label>
+                            <Input
+                                className="border-2"
+                                type="password"
+                                id="loginPass"
+                                autoComplete="current-password"
+                                placeholder="••••••••"
+                                required
+                            />
                         </div>
+
+                        <Button className="w-full" type="submit">
+                            Login
+                        </Button>
                     </form>
-                </CardContent>
-                <CardFooter className="flex justify-end">
-                    <Button className="cursor-pointer">Start</Button>
-                </CardFooter>
-            </Card>
+
+                    <p className="text-sm text-center text-muted-foreground mt-3">
+                        Don’t have an account?{" "}
+                        <button
+                            type="button"
+                            className="text-primary hover:underline font-medium cursor-pointer"
+                            onClick={signUpClick}
+                        >
+                            Sign up
+                        </button>
+                    </p>
+                </DialogContent>
+            </Dialog>
+
         </>
     )
 }

@@ -1,6 +1,6 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { addTabs, deleteTabs } from "../workoutRedux/NewTabReducer/NewTabReducer";
+// import { useDispatch, useSelector } from "react-redux";
+// import { addTabs, deleteTabs } from "../workoutRedux/NewTabReducer/NewTabReducer";
 import {
     Popover,
     PopoverContent,
@@ -9,16 +9,11 @@ import {
   
 
 export default function Dashboard() {
-    const allTab = useSelector((state) => state.customNewTab)// here acces store's reducer key
-    const dispatch = useDispatch();
 
     const handleNewTab = () => {
-        dispatch(addTabs());
     }
 
     const handleTabDelete = (value) => {
-        console.log(value);
-        dispatch(deleteTabs(value));
 
     }
     return (
