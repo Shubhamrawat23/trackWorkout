@@ -15,21 +15,22 @@ export const useWktStore = create((set) =>({
         ))
     },
 
-    userSignUpData:{
-        full_name:'',
+    user_Data:{
+        user_name:'',
         dob:'',
         email_id:'',
-        password:'',
+        // password:'',
         country_code:'',
         phone_number:'',
         created_date:'',
         state:'',
         country:'',
+        token:'',
     },
-    setUserSignupDetails: function (key,value) {
+    setUserDetails: function (value={}) {
         set((state)=>(
             {
-                userSignUpData:{...state.userSignUpData, [key]:value}
+                user_Data:{...state.user_Data, ...value}
             }
         ))
     },

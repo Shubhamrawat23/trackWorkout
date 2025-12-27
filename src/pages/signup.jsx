@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+// import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+    Dialog,
+    DialogFooter,
+    DialogDescription,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,27 +16,30 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { useWktStore } from "@/store";
 import supabase from "@/lib/supabaseClient";
 
-export default function MultiStepSignup({ isOpen }) {
+export default function MultiStepSignup() {
+
+    let userSignUpData = useWktStore((state) => state.user_Data)
+    let setUserSignupDetails = useWktStore((state) => state.setUserDetails)
+    let isSignupBoxShow = useWktStore((state)=>state.isSignupBoxShow)
+    let toggleSignupBox = useWktStore((state) => state.toggleSignupBox);
+
     const [step, setStep] = useState(1);
     const [errors, setErrors] = useState({
-        full_name:'',
-        dob:'',
-        email_id:'',
-        password:'',
-        country_code:'',
-        phone_number:'',
-        created_date:'',
-        state:'',
-        country:'',
+        user_name: '',
+        dob: '',
+        email_id: '',
+        password: '',
+        country_code: '',
+        phone_number: '',
+        created_date: '',
+        state: '',
+        country: '',
     });
-
-    let userSignUpData = useWktStore((state) => state.userSignUpData)
-    let setUserSignupDetails = useWktStore((state) => state.setUserSignupDetails)
 
     const handleChange = (field, value) => {
         // console.log("----- valu",field,value);
-        
-        setUserSignupDetails(field, value);
+
+        setUserSignupDetails({[field]: value});
         setErrors((prev) => ({ ...prev, [field]: "" }));
     };
 
@@ -83,7 +94,7 @@ export default function MultiStepSignup({ isOpen }) {
                     isValidationApproved = true;
                 }
                 break;
-            case "full_name":
+            case "user_name":
                 if (!value) {
                     reasonOfValidation = "Full name can't be empty";
                 } else if (value.length < 3) {
@@ -124,7 +135,7 @@ export default function MultiStepSignup({ isOpen }) {
         return { isValidationApproved, reasonOfValidation };
     }
 
-    function validateStep1(){
+    function validateStep1() {
         const fields = ["email_id", "password", "country_code", "phone_number"];
         let newErrors = {};
         let hasError = false;
@@ -138,12 +149,12 @@ export default function MultiStepSignup({ isOpen }) {
             }
         });
 
-        setErrors((prev)=>({...prev,...newErrors}));
+        setErrors((prev) => ({ ...prev, ...newErrors }));
 
         return hasError;
     };
     function validateStep2() {
-        const fields = ["full_name", "dob","state", "country"];
+        const fields = ["user_name", "dob", "state", "country"];
         let newErrors = {};
         let hasError = false;
 
@@ -163,44 +174,60 @@ export default function MultiStepSignup({ isOpen }) {
 
 
     // submit form for signup
-    const submitSignup = async function(){
-        console.log(userSignUpData.email_id,userSignUpData.password);
-        
+    const submitSignup = async function () {
+        // console.log(userSignUpData);
+
         const { data, error } = await supabase.auth.signUp({
-            email: userSignUpData.email_id,
-            password: userSignUpData.password
+            email: userSignUpData?.email_id,
+            password: userSignUpData?.password,
+            options:{
+                data:{
+                    user_name:userSignUpData?.user_name,
+                    phone_number:userSignUpData?.phone_number,
+                    country_code:userSignUpData?.country_code,
+                }
+            }
         })
 
-        console.log("DATA log = ", data);
-        console.log("ERROR log = ", error);
+        if (!error) {
+            console.log("data");
+            
+            if (data?.session) {
+                let token = data?.session?.access_token
+
+                setUserSignupDetails({['token']: token})
+                toggleSignupBox();
+            }
+        }
+        // console.log(userSignUpData);
         
     }
 
     // const nextStep = () => setStep(prev => Math.min(prev + 1, 3));
     const nextStep = () => {
-        if(step === 1 && validateStep1()) return;
-        if(step === 2 && validateStep2()) return;
+        if (step === 1 && validateStep1()) return;
+        if (step === 2 && validateStep2()) return;
 
         setStep(prev => Math.min(prev + 1, 3));
     };
     const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
     return (
-        <div className={`${isOpen ? "block" : "hidden"} min-h-full my-sm-30 my-10 flex items-center justify-center`}>
-            <Card className="w-full max-w-lg shadow-lg">
-                <CardHeader>
-                    <CardTitle className="text-center text-xl font-semibold">
+        <Dialog open={isSignupBoxShow} onOpenChange={toggleSignupBox} className="w-full max-w-lg shadow-lg">
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle className="text-center text-xl font-semibold">
                         {step === 1 && "Account Info"}
                         {step === 2 && "Profile and Location Info"}
                         {step === 3 && "Review & Submit"}
-                    </CardTitle>
+                    </DialogTitle>
                     <div className="mt-3">
                         <Progress value={(step / 4) * 100} className="h-2 rounded-full" />
                         <p className="text-xs text-muted-foreground mt-1 text-center">Step {step} of 3</p>
                     </div>
-                </CardHeader>
+                </DialogHeader>
 
-                <CardContent className="space-y-4">
+                <div className="space-y-4">
                     {/* Step 1 */}
                     {step === 1 && (
                         <>
@@ -209,7 +236,7 @@ export default function MultiStepSignup({ isOpen }) {
                                 <Input
                                     type="email"
                                     placeholder="you@example.com"
-                                    value={userSignUpData.email_id}
+                                    value={userSignUpData?.email_id}
                                     onChange={e => handleChange("email_id", e.target.value)}
                                 />
                                 <small className="text-red-700">{errors.email_id}</small>
@@ -235,7 +262,7 @@ export default function MultiStepSignup({ isOpen }) {
                                 <Input
                                     type="password"
                                     placeholder="********"
-                                    value={userSignUpData.password}
+                                    value={userSignUpData?.password}
                                     onChange={e => handleChange("password", e.target.value)}
                                 />
                                 <small className="text-red-700">{errors.password}</small>
@@ -246,7 +273,7 @@ export default function MultiStepSignup({ isOpen }) {
                                 <Label className="my-2">Phone Number</Label>
                                 <div className="flex gap-2">
                                     <Select
-                                        value={userSignUpData.country_code}
+                                        value={userSignUpData?.country_code}
                                         onValueChange={e => handleChange("country_code", e)}
                                     >
                                         <SelectTrigger className="w-auto">
@@ -263,7 +290,7 @@ export default function MultiStepSignup({ isOpen }) {
                                         pattern="[0-9]*"
                                         placeholder="xxxxxxxxxx"
                                         maxLength={10}
-                                        value={userSignUpData.phone_number}
+                                        value={userSignUpData?.phone_number}
                                         onChange={(e) => {
                                             const digitsOnly = e.target.value.replace(/\D/g, "");
                                             handleChange("phone_number", digitsOnly);
@@ -286,20 +313,20 @@ export default function MultiStepSignup({ isOpen }) {
                     {/* Step 2 */}
                     {step === 2 && (
                         <>
-                            <div id="full_name">
+                            <div id="user_name">
                                 <Label className="my-2">Full Name</Label>
                                 <Input
                                     placeholder="Jane Doe"
-                                    value={userSignUpData.full_name}
-                                    onChange={e => handleChange("full_name", e.target.value)}
+                                    value={userSignUpData?.user_name}
+                                    onChange={e => handleChange("user_name", e.target.value)}
                                 />
-                            <small className="text-red-700">{errors.full_name}</small>
+                                <small className="text-red-700">{errors.user_name}</small>
                             </div>
                             {/* <div>
                                 <Label className="my-2">Username</Label>
                                 <Input
                                     placeholder="janedoe"
-                                    value={userSignUpData.username}
+                                    value={userSignUpData?.username}
                                     onChange={e => handleChange("username", e.target.value)}
                                 />
                             </div> */}
@@ -307,15 +334,15 @@ export default function MultiStepSignup({ isOpen }) {
                                 <Label className="my-2">Date of Birth</Label>
                                 <Input
                                     type="date"
-                                    value={userSignUpData.dob}
+                                    value={userSignUpData?.dob}
                                     onChange={e => handleChange("dob", e.target.value)}
                                 />
-                            <small className="text-red-700">{errors.dob}</small>
+                                <small className="text-red-700">{errors.dob}</small>
                             </div>
                             <div id="country">
                                 <Label className="my-2">Country</Label>
                                 <Select
-                                    value={userSignUpData.country}
+                                    value={userSignUpData?.country}
                                     onValueChange={value => handleChange("country", value)}
                                 >
                                     <SelectTrigger>
@@ -328,16 +355,16 @@ export default function MultiStepSignup({ isOpen }) {
                                         <SelectItem value="other">Other</SelectItem>
                                     </SelectContent>
                                 </Select>
-                            <small className="text-red-700">{errors.country}</small>
+                                <small className="text-red-700">{errors.country}</small>
                             </div>
                             <div id="state">
                                 <Label className="my-2">State</Label>
                                 <Input
                                     placeholder="Haryana"
-                                    value={userSignUpData.state}
+                                    value={userSignUpData?.state}
                                     onChange={e => handleChange("state", e.target.value)}
                                 />
-                            <small className="text-red-700">{errors.state}</small>
+                                <small className="text-red-700">{errors.state}</small>
                             </div>
                         </>
                     )}
@@ -345,16 +372,17 @@ export default function MultiStepSignup({ isOpen }) {
                     {/* Step 3 */}
                     {step === 3 && (
                         <div className="space-y-2 text-sm">
-                            <div className="flex justify-between"><span>Email:</span><span>{userSignUpData.email_id}</span></div>
-                            {/* <div className="flex justify-between"><span>Username:</span><span>{userSignUpData.username}</span></div> */}
-                            <div className="flex justify-between"><span>Full Name:</span><span>{userSignUpData.full_name}</span></div>
-                            <div className="flex justify-between"><span>DOB:</span><span>{userSignUpData.dob}</span></div>
-                            <div className="flex justify-between"><span>Location:</span><span>{userSignUpData.state}, {userSignUpData.country}</span></div>
+                            <div className="flex justify-between"><span>Email:</span><span>{userSignUpData?.email_id}</span></div>
+                            {/* <div className="flex justify-between"><span>Username:</span><span>{userSignUpData?.username}</span></div> */}
+                            <div className="flex justify-between"><span>Full Name:</span><span>{userSignUpData?.user_name}</span></div>
+                            <div className="flex justify-between"><span>DOB:</span><span>{userSignUpData?.dob}</span></div>
+                            <div className="flex justify-between"><span>Location:</span><span>{userSignUpData?.state}, {userSignUpData?.country}</span></div>
                         </div>
                     )}
-
+                </div>
+                <DialogFooter>
                     {/* Navigation Buttons */}
-                    <div className="flex justify-between mt-6">
+                    <div className="w-full flex justify-between mt-6">
                         <Button className="cursor-pointer" variant="outline" disabled={step === 1} onClick={prevStep}>
                             Back
                         </Button>
@@ -362,8 +390,10 @@ export default function MultiStepSignup({ isOpen }) {
                             {step === 3 ? "Submit" : "Next"}
                         </Button>
                     </div>
-                </CardContent>
-            </Card>
-        </div>
+                </DialogFooter>
+
+
+            </DialogContent>
+        </Dialog>
     );
 }
