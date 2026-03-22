@@ -139,7 +139,7 @@ export default function WktSplitForm() {
         current_height:wktdata.height,
         BMI:wktdata.userBMI,
         created_on:UTCdate,
-        age:null
+        age:null,
       })
 
       // console.log(error);
