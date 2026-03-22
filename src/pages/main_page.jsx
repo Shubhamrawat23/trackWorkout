@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LogIn from "./login";
 import { useWktStore } from "@/store";
 import Signup from "./signup";
+import supabase from "@/lib/supabaseClient";
+import Dashboard from "./dashboard";
 
 
 export default function Main_page(){
@@ -11,6 +13,7 @@ export default function Main_page(){
         <>
             <LogIn isOpen={isloginBoxShow}></LogIn>
             <Signup></Signup>
+            <Dashboard/>
         </>
     )
 }

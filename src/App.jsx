@@ -8,7 +8,7 @@ import Main_page from './pages/main_page'
 function App() {
 
   return (
-    <div className="min-h-screen w-full text-[#FCFCFC] px-2 overflow-y-auto">
+    <div className="min-h-screen w-full flex flex-col text-[#FCFCFC] px-2 overflow-y-auto">
       <Pageheader></Pageheader>
       <Main_page></Main_page>
       {/* <LogIn></LogIn> */}
