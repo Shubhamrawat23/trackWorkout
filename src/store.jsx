@@ -51,6 +51,7 @@ export const useWktStore = create(
                 splitProgramId:null,
                 sets:null,
                 reps:null,
+                age:null,
                 weight:null,
                 targetWt:null,
                 height:null,

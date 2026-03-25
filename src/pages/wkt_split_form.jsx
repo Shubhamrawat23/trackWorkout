@@ -58,26 +58,38 @@ export default function WktSplitForm() {
       errors.splitProgramId = "Please select a split program"
     }
     
-    if (!data.sets) {
-      errors.sets = "Sets is required"
-    } else if (data.sets < 1) {
-      errors.sets = "Minimum 1 set";
-    } else if (data.sets > 20) {
-      errors.sets = "Maximum 20 sets";
+    if (data.sets != null) 
+    {
+      if (!data.sets) {
+        errors.sets = "Sets is required"
+      } else if (data.sets < 1) {
+        errors.sets = "Minimum 1 set";
+      } else if (data.sets > 20) {
+        errors.sets = "Maximum 20 sets";
+      }
     }
 
-    if (!data.reps) {
-      errors.reps = "Reps is required"
-    } else if (data.reps < 1) {
-      errors.reps = "Minimum 6 reps";
-    } else if (data.reps > 20) {
-      errors.reps = "Maximum 12 reps ";
+    if(data.reps != null)
+    {
+      if (!data.reps) {
+        errors.reps = "Reps is required"
+      } else if (data.reps < 1) {
+        errors.reps = "Minimum 6 reps";
+      } else if (data.reps > 20) {
+        errors.reps = "Maximum 12 reps ";
+      }
+    }
+
+    if (!data.age) {
+      errors.age = "Age is required";
+    } else if (data.age < 14){
+      errors.age = "Minimum age should be 14"
     }
 
     if (!data.weight) {
       errors.weight = "Weight is required";
-    } else if (data.currentWt < 20 || data.currentWt > 300) {
-      errors.currentWt = "Enter a valid weight (20-300 kg)";
+    } else if (data.weight < 20 || data.weight > 300) {
+      errors.weight = "Enter a valid weight (20-300 kg)";
     }
 
     if (!data.targetWt) {
@@ -96,7 +108,8 @@ export default function WktSplitForm() {
   }
 
   const handleProgramSubmit = ()=>{
-    // console.log(userWktInfo);
+   console.log(userWktInfo);
+
 
     const validationErrors = validateProgramForm(userWktInfo);
 
@@ -114,20 +127,8 @@ export default function WktSplitForm() {
     let UTCdate = new Date().toISOString().replace('T', ' ').replace('Z', ' ')
     if (wktdata?.reps!='' && wktdata?.sets!='' && wktdata?.splitProgramId!='' && sessionData!='') {
       
-      const {error} = await supabase.from('user_workout_info').insert({
-         user_id: sessionData?.user_id||12,//12 id is dummy for test to the functionality
-         wkt_split_id: wktdata.splitProgramId,
-         creator_type:'user',
-         no_of_sets:wktdata.sets,
-         no_of_reps:wktdata.reps,
-         created_on:UTCdate
-      })
-      // console.log(error);
-      if (error?.code==23505) {
-        alert('Already have the data of yours');
-      }else{
-        console.error(error?.message)
-      }
+      //fetch data from user wkt info table for get the id of that entry respective to splitProgramId and then save data in user personal info
+
     }
 
     if (wktdata?.weight!='' && wktdata?.targetWt!='' && wktdata?.height!='' && wktdata?.userBMI!='' && sessionData!='') {
@@ -234,9 +235,10 @@ export default function WktSplitForm() {
                   )}
                 </div>
 
-                {/* Sets / Reps / Weight */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
+                {/* Sets / Reps / Age / Weight */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Hide sets, reps coz this will be used for custom not predefined */}
+                  {/* <div>
                     <label>Sets</label>
                     <Input className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2" type="number" min="1" placeholder="No. of sets" onChange={(e)=>{
                     setUserWktInfo({sets:e.target.value})
@@ -255,11 +257,21 @@ export default function WktSplitForm() {
                     {programErrors?.reps && (
                       <span className="text-xs text-red-500 mt-1">{programErrors.reps}</span>
                     )}
+                  </div> */}
+                  <div>
+                    <label>Age</label>
+                    <Input className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2" type="number" min="14" placeholder="Your age" onChange={(e)=>{
+                    setUserWktInfo({age:+(e.target.value)});
+                    setProgramErrors((prev)=>({...prev, age:null}))
+                  }}required/>
+                    {programErrors?.age && (
+                      <span className="text-xs text-red-500 mt-1">{programErrors.age}</span>
+                    )}
                   </div>
                   <div>
                     <label>Weight (kg)</label>
                     <Input className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2" type="number" min="30" step=".5" placeholder="Your wt" onChange={(e)=>{
-                    setUserWktInfo({weight:e.target.value})
+                    setUserWktInfo({weight:+(e.target.value)})
                     setProgramErrors((prev)=>({...prev, weight:null}))
                   }} required/>
                     {programErrors?.weight && (
@@ -272,8 +284,8 @@ export default function WktSplitForm() {
                   <div>
                     <label>Target Weight (kg)</label>
                     <Input
-                      type="number" min="0" step="0.5" placeholder="Your Target wt" onChange={(e)=>{
-                    setUserWktInfo({targetWt:e.target.value})
+                      type="number" min="0" step="0.5" placeholder="Your Target wt" onChange={(e)=>{ 
+                    setUserWktInfo({targetWt:+(e.target.value)})
                     setProgramErrors((prev)=>({...prev, targetWt:null}))
                   }} required
                       className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2"
@@ -287,7 +299,7 @@ export default function WktSplitForm() {
                     <Input
                       type="number" min="0" placeholder="Your ht"
                       onChange={(e)=>{
-                    setUserWktInfo({height:e.target.value})
+                    setUserWktInfo({height:+(e.target.value)})
                     setProgramErrors((prev)=>({...prev, height:null}))
                   }}
                       required
