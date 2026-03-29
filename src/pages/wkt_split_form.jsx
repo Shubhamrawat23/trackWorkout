@@ -84,7 +84,7 @@ export default function WktSplitForm() {
       errors.age = "Age is required";
     } else if (data.age < 14){
       errors.age = "Minimum age should be 14"
-    }
+    }     
 
     if (!data.weight) {
       errors.weight = "Weight is required";
@@ -108,7 +108,7 @@ export default function WktSplitForm() {
   }
 
   const handleProgramSubmit = ()=>{
-   console.log(userWktInfo);
+  //  console.log(userWktInfo);
 
 
     const validationErrors = validateProgramForm(userWktInfo);
@@ -125,30 +125,34 @@ export default function WktSplitForm() {
 
   async function saveData(wktdata){
     let UTCdate = new Date().toISOString().replace('T', ' ').replace('Z', ' ')
-    if (wktdata?.reps!='' && wktdata?.sets!='' && wktdata?.splitProgramId!='' && sessionData!='') {
-      
-      //fetch data from user wkt info table for get the id of that entry respective to splitProgramId and then save data in user personal info
 
-    }
+    if (wktdata?.weight != '' && wktdata?.targetWt != '' && wktdata?.height != '' && wktdata?.userBMI != '' && wktdata?.splitProgramId != '' && sessionData != '') {
 
-    if (wktdata?.weight!='' && wktdata?.targetWt!='' && wktdata?.height!='' && wktdata?.userBMI!='' && sessionData!='') {
+      const { data: wktInfoData, error: wktInfoError } = await supabase
+        .from('user_workout_info')
+        .select('id')
+        .eq('wkt_split_id', wktdata?.splitProgramId)
+
+      if (wktInfoError) {
+        console.error("Error fetching wkt info:", wktInfoError.message);
+        return;
+      }
       
-      const {error} = await supabase.from('user_personal_info').insert({
-        user_id:sessionData?.user_id||12,//12 id is dummy for test t o the functionality
-        current_weight:wktdata.weight,
-        target_wt:wktdata.targetWt,
-        current_height:wktdata.height,
-        BMI:wktdata.userBMI,
-        created_on:UTCdate,
-        age:null,
+
+      const { error } = await supabase.from('user_personal_info').insert({
+        user_id: sessionData?.user_id || 12,//12 id is dummy for test t o the functionality
+        wkt_info_id: wktInfoData[0].id,
+        current_weight: wktdata.weight,
+        target_wt: wktdata.targetWt,
+        current_height: wktdata.height,
+        BMI: wktdata.userBMI,
+        created_on: UTCdate,
+        age: wktdata.age,
       })
 
       // console.log(error);
-      if (error?.code==23505) {
-        alert("Hve it");
-      }
-      else{
-        console.error(error?.message)
+      if (error?.code == 23505) {
+        alert("we have it");
       }
     }
   }
