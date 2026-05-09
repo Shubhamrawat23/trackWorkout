@@ -29,6 +29,7 @@ export const useWktStore = create(
                 state: '',
                 country: '',
                 token: '',
+                id: null,
             },
             setUserDetails: function (value = {}) {
                 set((state) => (
@@ -38,14 +39,14 @@ export const useWktStore = create(
                 ))
             },
     
-            sessionData: null,
-            set_session_data: function (value = {}) {
-                set((state) => (
-                    {
-                        sessionData: { ...value }
-                    }
-                ))
-            },
+            // sessionData: null,
+            // set_session_data: function (value = {}) {
+            //     set((state) => (
+            //         {
+            //             sessionData: { ...value }
+            //         }
+            //     ))
+            // },
 
             userWktInfo:{
                 splitProgramId:null,

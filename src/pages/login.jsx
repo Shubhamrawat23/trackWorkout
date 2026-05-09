@@ -28,32 +28,34 @@ export default function LogIn({ isOpen }) {
     const loginForm = async function (resp) {
         resp.preventDefault();
         
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data: authData, error } = await supabase.auth.signInWithPassword({
             email: resp.target[0].value,
             password: resp.target[1].value,
         })
         
         if (!error) {
-            // console.log(data);
+            console.log(authData);
             document.querySelector('.login_err').innerText = "";
 
-            if (data?.session) {
-                let token = data?.session?.access_token;
-                let email_id = data?.user?.email;
-                let phone = data?.user?.user_metadata?.phone_number;
-                let country_code = data?.user?.user_metadata?.country_code;
-                let user_name = data?.user?.user_metadata?.user_name;
-
-                let gmt_created_date = new Date(data?.user?.created_at);
-
+            if (authData?.session) {
+                let token = authData?.session?.access_token;
+                let email_id = authData?.session?.user?.email;
+                let gmt_created_date = new Date(authData?.session?.user?.created_at);
                 let created_at = gmt_created_date.toLocaleDateString("en",{
                     month:'long',
                     year:'numeric',
                     day:'numeric'
                 });
+                let user_data = null;
+
+                if(authData?.session?.user?.id){
+                    const {data, error} = await supabase.from('workout_users').select('id, user_name, phone_number, country_code').eq('user_code', `${authData?.session?.user?.id}`);
+
+                    user_data = data;
+                }
                 
 
-                setUserDetails({'token': token, 'email_id':email_id, 'phone_number':phone, 'country_code':country_code, 'user_name':user_name, 'created_date':created_at});
+                setUserDetails({'token': token, 'email_id':email_id, 'phone_number':user_data[0].phone_number, 'country_code':user_data[0].country_code, 'user_name':user_data[0].user_name, 'created_date':created_at, 'id':user_data[0].id});
 
                 toggleBox()
                 

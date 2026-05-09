@@ -30,7 +30,7 @@ export default function WktSplitForm() {
   const [splitData, setSplitData] = useState();
   const setUserWktInfo = useWktStore((state)=>state.setUserWktInfo);
   const userWktInfo = useWktStore((state)=>state.userWktInfo);
-  const sessionData = useWktStore((state)=>state.sessionData);
+  const user_Data = useWktStore((state)=>state.user_Data);
   const [programErrors, setProgramErrors] = useState();
   
   
@@ -126,7 +126,7 @@ export default function WktSplitForm() {
   async function saveData(wktdata){
     let UTCdate = new Date().toISOString().replace('T', ' ').replace('Z', ' ')
 
-    if (wktdata?.weight != '' && wktdata?.targetWt != '' && wktdata?.height != '' && wktdata?.userBMI != '' && wktdata?.splitProgramId != '' && sessionData != '') {
+    if (wktdata?.weight != '' && wktdata?.targetWt != '' && wktdata?.height != '' && wktdata?.userBMI != '' && wktdata?.splitProgramId != '' && user_Data != '') {
 
       const { data: wktInfoData, error: wktInfoError } = await supabase
         .from('user_workout_info')
@@ -140,7 +140,7 @@ export default function WktSplitForm() {
       
 
       const { error } = await supabase.from('user_personal_info').insert({
-        user_id: sessionData?.user_id || 12,//12 id is dummy for test t o the functionality
+        user_id: user_Data?.user_id || 12,//12 id is dummy for test to the functionality
         wkt_info_id: wktInfoData[0].id,
         current_weight: wktdata.weight,
         target_wt: wktdata.targetWt,
