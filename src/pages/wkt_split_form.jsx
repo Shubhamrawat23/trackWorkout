@@ -140,7 +140,7 @@ export default function WktSplitForm() {
       
 
       const { error } = await supabase.from('user_personal_info').insert({
-        user_id: user_Data?.user_id || 12,//12 id is dummy for test to the functionality
+        user_id: user_Data?.user_id,//12 id is dummy for test to the functionality
         wkt_info_id: wktInfoData[0].id,
         current_weight: wktdata.weight,
         target_wt: wktdata.targetWt,
