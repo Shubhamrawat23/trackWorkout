@@ -29,6 +29,7 @@ export const useWktStore = create(
                 state: '',
                 country: '',
                 token: '',
+                id: null,
             },
             setUserDetails: function (value = {}) {
                 set((state) => (
@@ -38,23 +39,25 @@ export const useWktStore = create(
                 ))
             },
     
-            sessionData: null,
-            set_session_data: function (value = {}) {
-                set((state) => (
-                    {
-                        sessionData: { ...value }
-                    }
-                ))
-            },
+            // sessionData: null,
+            // set_session_data: function (value = {}) {
+            //     set((state) => (
+            //         {
+            //             sessionData: { ...value }
+            //         }
+            //     ))
+            // },
 
             userWktInfo:{
                 splitProgramId:null,
                 sets:null,
                 reps:null,
+                age:null,
                 weight:null,
                 targetWt:null,
                 height:null,
-                userBMI:null
+                userBMI:null,
+                :null,
             },
             setUserWktInfo: function(value={}){
                 set((state)=>{

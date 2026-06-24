@@ -30,7 +30,7 @@ export default function WktSplitForm() {
   const [splitData, setSplitData] = useState();
   const setUserWktInfo = useWktStore((state)=>state.setUserWktInfo);
   const userWktInfo = useWktStore((state)=>state.userWktInfo);
-  const sessionData = useWktStore((state)=>state.sessionData);
+  const user_Data = useWktStore((state)=>state.user_Data);
   const [programErrors, setProgramErrors] = useState();
   
   
@@ -58,26 +58,38 @@ export default function WktSplitForm() {
       errors.splitProgramId = "Please select a split program"
     }
     
-    if (!data.sets) {
-      errors.sets = "Sets is required"
-    } else if (data.sets < 1) {
-      errors.sets = "Minimum 1 set";
-    } else if (data.sets > 20) {
-      errors.sets = "Maximum 20 sets";
+    if (data.sets != null) 
+    {
+      if (!data.sets) {
+        errors.sets = "Sets is required"
+      } else if (data.sets < 1) {
+        errors.sets = "Minimum 1 set";
+      } else if (data.sets > 20) {
+        errors.sets = "Maximum 20 sets";
+      }
     }
 
-    if (!data.reps) {
-      errors.reps = "Reps is required"
-    } else if (data.reps < 1) {
-      errors.reps = "Minimum 6 reps";
-    } else if (data.reps > 20) {
-      errors.reps = "Maximum 12 reps ";
+    if(data.reps != null)
+    {
+      if (!data.reps) {
+        errors.reps = "Reps is required"
+      } else if (data.reps < 1) {
+        errors.reps = "Minimum 6 reps";
+      } else if (data.reps > 20) {
+        errors.reps = "Maximum 12 reps ";
+      }
     }
+
+    if (!data.age) {
+      errors.age = "Age is required";
+    } else if (data.age < 14){
+      errors.age = "Minimum age should be 14"
+    }     
 
     if (!data.weight) {
       errors.weight = "Weight is required";
-    } else if (data.currentWt < 20 || data.currentWt > 300) {
-      errors.currentWt = "Enter a valid weight (20-300 kg)";
+    } else if (data.weight < 20 || data.weight > 300) {
+      errors.weight = "Enter a valid weight (20-300 kg)";
     }
 
     if (!data.targetWt) {
@@ -96,7 +108,8 @@ export default function WktSplitForm() {
   }
 
   const handleProgramSubmit = ()=>{
-    // console.log(userWktInfo);
+  //  console.log(userWktInfo);
+
 
     const validationErrors = validateProgramForm(userWktInfo);
 
@@ -111,43 +124,23 @@ export default function WktSplitForm() {
   }
 
   async function saveData(wktdata){
-    let UTCdate = new Date().toISOString().replace('T', ' ').replace('Z', ' ')
-    if (wktdata?.reps!='' && wktdata?.sets!='' && wktdata?.splitProgramId!='' && sessionData!='') {
-      
-      const {error} = await supabase.from('user_workout_info').insert({
-         user_id: sessionData?.user_id||12,//12 id is dummy for test to the functionality
-         wkt_split_id: wktdata.splitProgramId,
-         creator_type:'user',
-         no_of_sets:wktdata.sets,
-         no_of_reps:wktdata.reps,
-         created_on:UTCdate
-      })
-      // console.log(error);
-      if (error?.code==23505) {
-        alert('Already have the data of yours');
-      }else{
-        console.error(error?.message)
-      }
-    }
+    if (wktdata?.weight != '' && wktdata?.targetWt != '' && wktdata?.height != '' && wktdata?.userBMI != '' && wktdata?.splitProgramId != '' && user_Data != '') {
 
-    if (wktdata?.weight!='' && wktdata?.targetWt!='' && wktdata?.height!='' && wktdata?.userBMI!='' && sessionData!='') {
-      
-      const {error} = await supabase.from('user_personal_info').insert({
-        user_id:sessionData?.user_id||12,//12 id is dummy for test t o the functionality
-        current_weight:wktdata.weight,
-        target_wt:wktdata.targetWt,
-        current_height:wktdata.height,
-        BMI:wktdata.userBMI,
-        created_on:UTCdate,
-        age:null,
+      const { data, error } = await supabase.rpc('set_user_personal_split_data',{
+        p_user_id: user_Data?.user_id,//12 id is dummy for test to the functionality
+        p_current_wt: `${wktdata.weight} Kg`,
+        p_target_wt: `${wktdata.targetWt} Kg`,
+        p_current_ht: `${wktdata.height} Cm`,
+        p_bmi: wktdata.userBMI,
+        p_age: wktdata.age,
+        p_split_id: wktdata.splitProgramId
       })
 
+      setUserWktInfo({userActiveSplitConfig:data.map_id});
+
       // console.log(error);
-      if (error?.code==23505) {
-        alert("Hve it");
-      }
-      else{
-        console.error(error?.message)
+      if (error?.code == 23505) {
+        alert("we have it");
       }
     }
   }
@@ -207,6 +200,8 @@ export default function WktSplitForm() {
         {/* Content */}
         <div className="px-6 py-5">
           <div key={activeTab} style={{ animation: "fadeUp 0.2s cubic-bezier(.4,0,.2,1)" }}>
+
+            
             {activeTab === "split" ?
               // ------------------ Split Programs Section ---------------------------------
               <div className="space-y-5">
@@ -234,32 +229,22 @@ export default function WktSplitForm() {
                   )}
                 </div>
 
-                {/* Sets / Reps / Weight */}
-                <div className="grid grid-cols-3 gap-3">
+                {/* Age / Weight */}
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label>Sets</label>
-                    <Input className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2" type="number" min="1" placeholder="No. of sets" onChange={(e)=>{
-                    setUserWktInfo({sets:e.target.value})
-                    setProgramErrors((prev)=>({...prev, sets:null}))
-                  }} required/>
-                    {programErrors?.sets && (
-                      <span className="text-xs text-red-500 mt-1">{programErrors.sets}</span>
-                    )}
-                  </div>
-                  <div>
-                    <label>Reps</label>
-                    <Input className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2" type="number" min="1" placeholder="No. of reps" onChange={(e)=>{
-                    setUserWktInfo({reps:e.target.value});
-                    setProgramErrors((prev)=>({...prev, reps:null}))
+                    <label>Age</label>
+                    <Input className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2" type="number" min="14" placeholder="Your age" onChange={(e)=>{
+                    setUserWktInfo({age:+(e.target.value)});
+                    setProgramErrors((prev)=>({...prev, age:null}))
                   }}required/>
-                    {programErrors?.reps && (
-                      <span className="text-xs text-red-500 mt-1">{programErrors.reps}</span>
+                    {programErrors?.age && (
+                      <span className="text-xs text-red-500 mt-1">{programErrors.age}</span>
                     )}
                   </div>
                   <div>
                     <label>Weight (kg)</label>
                     <Input className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2" type="number" min="30" step=".5" placeholder="Your wt" onChange={(e)=>{
-                    setUserWktInfo({weight:e.target.value})
+                    setUserWktInfo({weight:+(e.target.value)})
                     setProgramErrors((prev)=>({...prev, weight:null}))
                   }} required/>
                     {programErrors?.weight && (
@@ -272,8 +257,8 @@ export default function WktSplitForm() {
                   <div>
                     <label>Target Weight (kg)</label>
                     <Input
-                      type="number" min="0" step="0.5" placeholder="Your Target wt" onChange={(e)=>{
-                    setUserWktInfo({targetWt:e.target.value})
+                      type="number" min="0" step="0.5" placeholder="Your Target wt" onChange={(e)=>{ 
+                    setUserWktInfo({targetWt:+(e.target.value)})
                     setProgramErrors((prev)=>({...prev, targetWt:null}))
                   }} required
                       className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2"
@@ -287,7 +272,7 @@ export default function WktSplitForm() {
                     <Input
                       type="number" min="0" placeholder="Your ht"
                       onChange={(e)=>{
-                    setUserWktInfo({height:e.target.value})
+                    setUserWktInfo({height:+(e.target.value)})
                     setProgramErrors((prev)=>({...prev, height:null}))
                   }}
                       required

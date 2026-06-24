@@ -1,6 +1,4 @@
 import React from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import { addTabs, deleteTabs } from "../workoutRedux/NewTabReducer/NewTabReducer";
 import {
     Popover,
     PopoverContent,
@@ -8,6 +6,7 @@ import {
   } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button";
 import WktSplitForm from "./wkt_split_form";
+import WktTab from "./wktTab";
   
 
 export default function Dashboard() {
@@ -19,9 +18,12 @@ export default function Dashboard() {
 
     }
     return (
-        <div className="flex flex-1">
+        <div className="">
             {/* <Button className="m-auto cursor-pointer">Let's Begin</Button> */}
-            <WktSplitForm/>
+            {/* <WktSplitForm/> */}
+
+            <WktTab></WktTab>
+            
         </div>
     )
 }
