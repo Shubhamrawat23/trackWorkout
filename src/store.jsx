@@ -56,7 +56,8 @@ export const useWktStore = create(
                 weight:null,
                 targetWt:null,
                 height:null,
-                userBMI:null
+                userBMI:null,
+                :null,
             },
             setUserWktInfo: function(value={}){
                 set((state)=>{

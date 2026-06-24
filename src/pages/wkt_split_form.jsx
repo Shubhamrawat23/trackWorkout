@@ -124,31 +124,19 @@ export default function WktSplitForm() {
   }
 
   async function saveData(wktdata){
-    let UTCdate = new Date().toISOString().replace('T', ' ').replace('Z', ' ')
-
     if (wktdata?.weight != '' && wktdata?.targetWt != '' && wktdata?.height != '' && wktdata?.userBMI != '' && wktdata?.splitProgramId != '' && user_Data != '') {
 
-      const { data: wktInfoData, error: wktInfoError } = await supabase
-        .from('user_workout_info')
-        .select('id')
-        .eq('wkt_split_id', wktdata?.splitProgramId)
-
-      if (wktInfoError) {
-        console.error("Error fetching wkt info:", wktInfoError.message);
-        return;
-      }
-      
-
-      const { error } = await supabase.from('user_personal_info').insert({
-        user_id: user_Data?.user_id,//12 id is dummy for test to the functionality
-        wkt_info_id: wktInfoData[0].id,
-        current_weight: wktdata.weight,
-        target_wt: wktdata.targetWt,
-        current_height: wktdata.height,
-        BMI: wktdata.userBMI,
-        created_on: UTCdate,
-        age: wktdata.age,
+      const { data, error } = await supabase.rpc('set_user_personal_split_data',{
+        p_user_id: user_Data?.user_id,//12 id is dummy for test to the functionality
+        p_current_wt: `${wktdata.weight} Kg`,
+        p_target_wt: `${wktdata.targetWt} Kg`,
+        p_current_ht: `${wktdata.height} Cm`,
+        p_bmi: wktdata.userBMI,
+        p_age: wktdata.age,
+        p_split_id: wktdata.splitProgramId
       })
+
+      setUserWktInfo({userActiveSplitConfig:data.map_id});
 
       // console.log(error);
       if (error?.code == 23505) {
@@ -212,6 +200,8 @@ export default function WktSplitForm() {
         {/* Content */}
         <div className="px-6 py-5">
           <div key={activeTab} style={{ animation: "fadeUp 0.2s cubic-bezier(.4,0,.2,1)" }}>
+
+            
             {activeTab === "split" ?
               // ------------------ Split Programs Section ---------------------------------
               <div className="space-y-5">
@@ -239,29 +229,8 @@ export default function WktSplitForm() {
                   )}
                 </div>
 
-                {/* Sets / Reps / Age / Weight */}
+                {/* Age / Weight */}
                 <div className="grid grid-cols-2 gap-3">
-                  {/* Hide sets, reps coz this will be used for custom not predefined */}
-                  {/* <div>
-                    <label>Sets</label>
-                    <Input className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2" type="number" min="1" placeholder="No. of sets" onChange={(e)=>{
-                    setUserWktInfo({sets:e.target.value})
-                    setProgramErrors((prev)=>({...prev, sets:null}))
-                  }} required/>
-                    {programErrors?.sets && (
-                      <span className="text-xs text-red-500 mt-1">{programErrors.sets}</span>
-                    )}
-                  </div>
-                  <div>
-                    <label>Reps</label>
-                    <Input className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2" type="number" min="1" placeholder="No. of reps" onChange={(e)=>{
-                    setUserWktInfo({reps:e.target.value});
-                    setProgramErrors((prev)=>({...prev, reps:null}))
-                  }}required/>
-                    {programErrors?.reps && (
-                      <span className="text-xs text-red-500 mt-1">{programErrors.reps}</span>
-                    )}
-                  </div> */}
                   <div>
                     <label>Age</label>
                     <Input className="text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-500 mt-2" type="number" min="14" placeholder="Your age" onChange={(e)=>{

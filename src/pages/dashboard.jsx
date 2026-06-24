@@ -7,7 +7,6 @@ import {
 import { Button } from "@/components/ui/button";
 import WktSplitForm from "./wkt_split_form";
 import WktTab from "./wktTab";
-import ExerciseCard from "@/components/exerciseCard";
   
 
 export default function Dashboard() {
@@ -19,13 +18,11 @@ export default function Dashboard() {
 
     }
     return (
-        <div className="flex flex-1">
+        <div className="">
             {/* <Button className="m-auto cursor-pointer">Let's Begin</Button> */}
             {/* <WktSplitForm/> */}
 
-            {/* <WktTab></WktTab> */}
-
-            <ExerciseCard/>
+            <WktTab></WktTab>
             
         </div>
     )
