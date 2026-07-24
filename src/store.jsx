@@ -57,7 +57,7 @@ export const useWktStore = create(
                 targetWt:null,
                 height:null,
                 userBMI:null,
-                :null,
+                userActiveSplitConfig:null,
             },
             setUserWktInfo: function(value={}){
                 set((state)=>{
