@@ -47,8 +47,7 @@ export default function WktTab() {
     return (
         <>
             <div className="text-2xl sm:text-4xl mt-2">
-                {userWktData?.split?.name} Split (
-                {userWktData?.split?.code})
+                {userWktData?.split?.name} Split ({userWktData?.split?.code})
             </div>
 
             <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 w-full sm:p-5 gap-2 sm:gap-4">
