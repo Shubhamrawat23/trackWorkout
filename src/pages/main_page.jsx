@@ -6,7 +6,7 @@ import supabase from "@/lib/supabaseClient";
 import Dashboard from "./dashboard";
 
 
-export default function Main_page(){
+export default function MainPage(){
     const isloginBoxShow = useWktStore((state) => state.isloginBoxShow);
     // const isSignupBoxShow = useWktStore((state) => state.isSignupBoxShow);
     return (
