@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import { Plus } from "lucide-react";
 import ExLogCard from "@/components/exerciseLogCard";
 import DateRail from "@/components/leftDateRail";
 import DateScroller from "@/components/topDateRail";
+import useSplitsExLog from "@/hooks/useSplitsExLog";
 // import BottomNav from "@/components/bottomNav";
 
 
@@ -38,6 +39,14 @@ const dates = [
 
 export default function WorkoutLog() {
   const [selectedDate, setSelectedDate] = useState("July 6");
+  const {getSplitExerciseDates} = useSplitsExLog()
+
+  useEffect(() => {
+  (async () => {
+    const result = await getSplitExerciseDates(12, 1);
+    // console.log("full result:", result);
+  })();
+}, []);
 
   const [bench, setBench] = useState([
     { set: "Set 1", weight: 130, unit: "kg", reps: [5] },
