@@ -35,6 +35,23 @@ const dates = [
   "July 11",
   "July 12",
   "July 13",
+  "July 14",
+  "July 15",
+  "July 16",
+  "July 17",
+  "July 18",
+  "July 19",
+  "July 20",
+  "July 21",
+  "July 22",
+  "July 23",
+  "July 24",
+  "July 25",
+  "July 26",
+  "July 27",
+  "July 28",
+  "July 29",
+  "July 30",
 ];
 
 export default function WorkoutLog() {
@@ -44,7 +61,12 @@ export default function WorkoutLog() {
   useEffect(() => {
   (async () => {
     const result = await getSplitExerciseDates(12, 1);
-    // console.log("full result:", result);
+    console.log("full result:", result);
+    // const currentDate = (new Date()).toLocaleDateString('en-US',{
+    //   month:'short',
+    //   day:'numeric'
+    // })
+
   })();
 }, []);
 
@@ -67,15 +89,9 @@ export default function WorkoutLog() {
 
   return (
     <div className="bg-black min-h-screen p-4 sm:p-6 pb-24 md:pb-6">
-      {/* Mobile-only app header */}
-      <div className="md:hidden text-center mb-4">
-        <h1 className="text-white text-2xl font-serif tracking-widest uppercase">
-          Athlete Hub
-        </h1>
-      </div>
 
       {/* Desktop breadcrumb */}
-      <div className="hidden md:flex items-center gap-2 mb-6">
+      <div className="md:flex items-center gap-2 mb-6">
         <span className="text-zinc-500 text-2xl font-semibold">Log</span>
         <span className="text-zinc-600 text-2xl">→</span>
         <span className="text-white text-2xl font-bold">Monday, July 6, 2026</span>

@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import supabase from "@/lib/supabaseClient";
-import { useWktStore } from "@/store";
+import { useWktStore } from "@/store/store";
 
 const ReadOnlyBadge = () => (
   <span style={{

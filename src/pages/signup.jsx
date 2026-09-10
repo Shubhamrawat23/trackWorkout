@@ -1,9 +1,7 @@
 import { useState } from "react";
-// import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
     Dialog,
     DialogFooter,
-    DialogDescription,
     DialogContent,
     DialogHeader,
     DialogTitle,
@@ -13,15 +11,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { useWktStore } from "@/store";
+import { useWktStore } from "@/store/store";
 import supabase from "@/lib/supabaseClient";
+import { useNavigate } from "react-router";
 
-export default function MultiStepSignup() {
+export default function MultiStepSignup({ dailogOpen }) {
 
-    let userSignUpData = useWktStore((state) => state.user_Data)
-    let setUserSignupDetails = useWktStore((state) => state.setUserDetails)
-    let isSignupBoxShow = useWktStore((state)=>state.isSignupBoxShow)
-    let toggleSignupBox = useWktStore((state) => state.toggleSignupBox);
+    const [showPassword, setShowPassword] = useState(false);
+    const userSignUpData = useWktStore((state) => state.user_Data)
+    const setUserSignupDetails = useWktStore((state) => state.setUserDetails)
+    const navigate = useNavigate()
 
     const [step, setStep] = useState(1);
     const [errors, setErrors] = useState({
@@ -39,7 +38,7 @@ export default function MultiStepSignup() {
     const handleChange = (field, value) => {
         // console.log("----- valu",field,value);
 
-        setUserSignupDetails({[field]: value});
+        setUserSignupDetails({ [field]: value });
         setErrors((prev) => ({ ...prev, [field]: "" }));
     };
 
@@ -85,15 +84,30 @@ export default function MultiStepSignup() {
                 }
                 break;
 
-            case 'password':
+            case 'password': {
+                const minLength = 6;
+                const hasUpper = /[A-Z]/.test(value);
+                const hasLower = /[a-z]/.test(value);
+                const hasNumber = /[0-9]/.test(value);
+                const hasSpecial = /[!@#$%^&*(),.?":{}|<>_\-+=]/.test(value);
+
                 if (!value) {
                     reasonOfValidation = "Password can't be empty";
-                } else if (value.length < 6) {
+                } else if (value.length < minLength) {
                     reasonOfValidation = "Password must be at least 6 characters";
+                } else if (!hasUpper) {
+                    reasonOfValidation = "Password must include at least one uppercase letter";
+                } else if (!hasLower) {
+                    reasonOfValidation = "Password must include at least one lowercase letter";
+                } else if (!hasNumber) {
+                    reasonOfValidation = "Password must include at least one number";
+                } else if (!hasSpecial) {
+                    reasonOfValidation = "Password must include at least one special character";
                 } else {
                     isValidationApproved = true;
                 }
                 break;
+            }
             case "user_name":
                 if (!value) {
                     reasonOfValidation = "Full name can't be empty";
@@ -180,27 +194,26 @@ export default function MultiStepSignup() {
         const { data, error } = await supabase.auth.signUp({
             email: userSignUpData?.email_id,
             password: userSignUpData?.password,
-            options:{
-                data:{
-                    user_name:userSignUpData?.user_name,
-                    phone_number:userSignUpData?.phone_number,
-                    country_code:userSignUpData?.country_code,
+            options: {
+                data: {
+                    user_name: userSignUpData?.user_name,
+                    phone_number: userSignUpData?.phone_number,
+                    country_code: userSignUpData?.country_code,
                 }
             }
         })
 
         if (!error) {
             console.log("data");
-            
+
             if (data?.session) {
                 let token = data?.session?.access_token
 
-                setUserSignupDetails({['token']: token})
-                toggleSignupBox();
+                setUserSignupDetails({ ['token']: token })
             }
         }
         // console.log(userSignUpData);
-        
+
     }
 
     // const nextStep = () => setStep(prev => Math.min(prev + 1, 3));
@@ -213,8 +226,13 @@ export default function MultiStepSignup() {
     const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
     return (
-        <Dialog open={isSignupBoxShow} onOpenChange={toggleSignupBox} className="w-full max-w-lg shadow-lg">
-            <DialogContent>
+        <Dialog open={dailogOpen} onOpenChange={(value) => {
+            if (!value) {
+                navigate("/")
+            }
+        }}
+            className="w-full max-w-lg shadow-lg">
+            <DialogContent aria-describedby="">
                 <DialogHeader>
                     <DialogTitle className="text-center text-xl font-semibold">
                         {step === 1 && "Account Info"}
@@ -243,31 +261,41 @@ export default function MultiStepSignup() {
                             </div>
                             <div id="signup_pass_box" className="relative">
                                 <Label className="my-2">Password</Label>
-                                {/* Eye-off (hide) */}
-                                <svg xmlns="http://www.w3.org/2000/svg" className={`absolute right-2 ${errors.password ? 'bottom-8' : 'bottom-2'}`} width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                                    <path d="M2.5 12s3.5-7.5 9.5-7.5S21.5 12 21.5 12s-3.5 7.5-9.5 7.5S2.5 12 2.5 12z" />
-                                    <circle cx="12" cy="12" r="3" />
-                                    <line x1="3.5" y1="3.5" x2="20.5" y2="20.5" />
-                                </svg>
 
-                                {/* Eye (show) */}
-                                <svg xmlns="http://www.w3.org/2000/svg" className="absolute right-2 bottom-2 hidden" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                                    <path d="M2.5 12s3.5-7.5 9.5-7.5S21.5 12 21.5 12s-3.5 7.5-9.5 7.5S2.5 12 2.5 12z" />
-                                    <circle cx="12" cy="12" r="3" />
-                                </svg>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((prev) => !prev)}
+                                    className={`absolute right-2 ${errors.password ? 'bottom-8' : 'bottom-2'} text-muted-foreground`}
+                                    tabIndex={-1}
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showPassword ? (
+                                        // Eye (show state — click to hide)
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
+                                            strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M2.5 12s3.5-7.5 9.5-7.5S21.5 12 21.5 12s-3.5 7.5-9.5 7.5S2.5 12 2.5 12z" />
+                                            <circle cx="12" cy="12" r="3" />
+                                        </svg>
+                                    ) : (
+                                        // Eye-off (hidden state — click to show)
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
+                                            strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M2.5 12s3.5-7.5 9.5-7.5S21.5 12 21.5 12s-3.5 7.5-9.5 7.5S2.5 12 2.5 12z" />
+                                            <circle cx="12" cy="12" r="3" />
+                                            <line x1="3.5" y1="3.5" x2="20.5" y2="20.5" />
+                                        </svg>
+                                    )}
+                                </button>
+
                                 <Input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     placeholder="********"
                                     value={userSignUpData?.password}
                                     onChange={e => handleChange("password", e.target.value)}
                                 />
                                 <small className="text-red-700">{errors.password}</small>
-
-
                             </div>
                             <div id="mobile_num">
                                 <Label className="my-2">Phone Number</Label>

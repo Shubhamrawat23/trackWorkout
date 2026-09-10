@@ -1,6 +1,6 @@
 import ExerciseCard from "@/components/exerciseCard";
 import { useWktSplitConfigInfo } from "@/hooks/useWktSplitConfigInfo";
-import { useWktStore } from "@/store";
+import { useWktStore } from "@/store/store";
 import React, { useEffect, useState } from "react";
 
 export default function WktTab() {

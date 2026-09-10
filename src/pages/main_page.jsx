@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import LogIn from "./login";
-import { useWktStore } from "@/store";
+import { useWktStore } from "@/store/store";
 import Signup from "./signup";
 import supabase from "@/lib/supabaseClient";
 import Dashboard from "./dashboard";

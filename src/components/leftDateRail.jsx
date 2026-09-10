@@ -2,7 +2,7 @@ import React from "react";
 // Vertical rail --- desktop only
 export default function DateRail({ selected, onSelect, dates=[] }) {
   return (
-    <div className="hidden md:flex flex-col pt-1 pr-6 relative">
+    <div className="hidden md:flex flex-col pt-1 pr-6 relative overflow-y-auto">
       <div className="absolute left-[5px] top-2 bottom-2 w-px bg-zinc-800" />
       {dates.map((d) => {
         const isActive = d === selected;
