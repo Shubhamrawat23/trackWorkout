@@ -9,20 +9,15 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { useWktStore } from "@/store";
+import { useWktStore } from "@/store/store";
 import supabase from "@/lib/supabaseClient";
+import { Link, useNavigate } from "react-router";
 
 
-export default function LogIn({ isOpen }) {
-    const toggleBox = useWktStore((state) => state.toggleLoginBox);
-    const toggleSignupBox = useWktStore((state) => state.toggleSignupBox);
+export default function LogIn({open}) {
     const setUserDetails = useWktStore((state)=>state.setUserDetails)
-    let userSignUpData = useWktStore((state) => state.user_Data)
-
-    const signUpClick = () => {
-        toggleBox();
-        toggleSignupBox();
-    };
+    const userSignUpData = useWktStore((state) => state.user_Data)
+    const navigate = useNavigate()
 
     
     const loginForm = async function (resp) {
@@ -56,9 +51,8 @@ export default function LogIn({ isOpen }) {
                 
 
                 setUserDetails({'token': token, 'email_id':email_id, 'phone_number':user_data[0].phone_number, 'country_code':user_data[0].country_code, 'user_name':user_data[0].user_name, 'created_date':created_at, 'id':user_data[0].id});
-
-                toggleBox()
                 
+                navigate("/dashboard")
             }
             
         }else{
@@ -71,7 +65,11 @@ export default function LogIn({ isOpen }) {
     }
     return (
         <>
-            <Dialog open={isOpen} onOpenChange={toggleBox}>
+            <Dialog open={open} onOpenChange={(value)=>{
+                if (!value) {
+                    navigate("/")
+                }
+            }}>
                 <DialogContent className="sm:max-w-[400px]">
                     <DialogHeader>
                         <DialogTitle className="text-center text-xl font-semibold">
@@ -115,13 +113,12 @@ export default function LogIn({ isOpen }) {
 
                     <p className="text-sm text-center text-muted-foreground mt-3">
                         Don’t have an account?{" "}
-                        <button
-                            type="button"
+                        <Link
                             className="text-primary hover:underline font-medium cursor-pointer"
-                            onClick={signUpClick}
+                            to={"/signup"}
                         >
                             Sign up
-                        </button>
+                        </Link>
                     </p>
                 </DialogContent>
             </Dialog>

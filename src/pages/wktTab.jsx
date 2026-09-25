@@ -1,10 +1,8 @@
 import ExerciseCard from "@/components/exerciseCard";
-import { useWktSplitConfigInfo } from "@/hooks/useWktSplitConfigInfo";
-import { useWktStore } from "@/store";
+import { useWktStore } from "@/store/store";
 import React, { useEffect, useState } from "react";
 
-export default function WktTab() {
-    const { wktData } = useWktSplitConfigInfo();
+export default function WktTab({wktData}) {
 
     const user_Data = useWktStore((state) => state.user_Data);
     const userWktInfo = useWktStore((state) => state.userWktInfo);

@@ -1,29 +1,70 @@
-import React from "react";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-  } from "@/components/ui/popover"
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import WktSplitForm from "./wkt_split_form";
-import WktTab from "./wktTab";
-  
+import { useWktSplitConfigInfo } from "@/hooks/useWktSplitConfigInfo";
+import { useNavigate } from "react-router";
+import { useWktStore } from "@/store/store";
+import SplitGrid from "./splitGrid";
+
 
 export default function Dashboard() {
+    const { wktData } = useWktSplitConfigInfo();
+    const userId = useWktStore((state) => state.user_Data.id);
+    const userWktInfo = useWktStore((state) => state.userWktInfo);
+    const setUserWktInfo = useWktStore((state) => state.setUserWktInfo)
+    const navigate = useNavigate()
+    const [splitList, setSplitList] = useState([])
+    const [loading, setLoading] = useState(true) 
 
-    const handleNewTab = () => {
-    }
+    useEffect(() => {
+        if (!userId) {
+            setLoading(false)
+            return;
+        }
 
-    const handleTabDelete = (value) => {
+        const load = async () => {
+            try {
+                const res = await wktData(userId);
+                console.log(userId);
 
-    }
+                if (!res.success) {
+                    console.error(res.message);
+                    return;
+                }
+
+                const activeConfig = res.data.find((item) => item.is_active) || null;
+
+                setSplitList(res.data)
+
+                setUserWktInfo({
+                    splitProgramId: activeConfig?.split?.id ?? null,
+                    userActiveSplitConfig: activeConfig,
+                });
+            } finally {
+                setLoading(false)
+            }
+        };
+
+        load();
+    }, [userId]);
+
     return (
-        <div className="">
-            {/* <Button className="m-auto cursor-pointer">Let's Begin</Button> */}
-            {/* <WktSplitForm/> */}
-
-            <WktTab></WktTab>
-            
+        <div className="h-full flex justify-center align-center">
+            {loading ? (
+                <div className="m-auto flex flex-col items-center gap-3 text-white">
+                    <div
+                        role="status"
+                        aria-label="Loading"
+                        className="h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-t-white"
+                    />
+                    <p className="text-sm text-white/60">Loading your workouts...</p>
+                </div>
+            ) : userWktInfo.userActiveSplitConfig ? (
+                <SplitGrid items={splitList} />
+            ) : (
+                <Button className="m-auto cursor-pointer" onClick={() => navigate("setup")}>
+                    Let's Begin
+                </Button>
+            )}
         </div>
     )
 }

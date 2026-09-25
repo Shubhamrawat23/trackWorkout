@@ -2,77 +2,60 @@ import supabase from "@/lib/supabaseClient";
 
 export function useWktSplitConfigInfo() {
 
-    const wktData = async (user_id, split_config_map_id) => {
+    const wktData = async (user_id, split_config_map_id = null) => {
 
-        const { data, error } = await supabase
+        let query = supabase
             .from('user_split_wkt_map')
             .select(`
                 id,
                 split_id,
-                wkt_config_id,
-                is_active
-            `)
-            .eq('user_id', user_id)
-            .eq('id', split_config_map_id)
-            .single();
-
-        if (error) {
-            return {
-                success: false,
-                message: error.message,
-                data: null
-            };
-        }
-
-        const splitData = await fetchSplitData(data.split_id);
-
-        if (!splitData.success) {
-            return splitData;
-        }
-
-        return {
-            success: true,
-            message: 'Workout split fetched successfully',
-            data: {
-                id: data.id,
-                wkt_config_id: data.wkt_config_id,
-                is_active: data.is_active,
-                split: splitData.data
-            }
-        };
-    };
-
-    async function fetchSplitData(split_id) {
-
-        const { data, error } = await supabase
-            .from('wkt_splits')
-            .select(`
-                id,
-                name,
-                code,
-                split_info (
-                    *
+                is_active,
+                created_at,
+                wkt_info:user_wkt_info (
+                    no_of_sets,
+                    no_of_reps,
+                    no_of_exercises
+                ),
+                split:wkt_splits (
+                    id,
+                    name,
+                    code,
+                    split_info (*)
                 )
             `)
-            .eq('id', split_id)
-            .single();
+            .eq('user_id', user_id);
+
+
+        if (split_config_map_id) {
+            const { data, error } = await query
+                .eq('id', split_config_map_id)
+                .maybeSingle();
+
+            if (error) {
+                return { success: false, message: error.message, data: null };
+            }
+
+            return {
+                success: true,
+                message: 'Workout split fetched successfully',
+                data
+            };
+        }
+
+        const { data, error } = await query.order('id', { ascending: true });
+        console.log(data);
+
 
         if (error) {
-            return {
-                success: false,
-                message: error.message,
-                data: null
-            };
+            return { success: false, message: error.message, data: [] };
         }
 
         return {
             success: true,
-            message: 'Split fetched successfully',
+            message: 'Workout split list fetched successfully',
             data
         };
-    }
-
-    return {
-        wktData,
     };
+
+    return { wktData };
 }
