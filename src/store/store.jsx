@@ -1,36 +1,36 @@
 import { create } from "zustand";
-import {persist} from "zustand/middleware"
+import { createJSONStorage, persist } from "zustand/middleware"
+
+const initialUserData = {
+    user_name: '',
+    dob: '',
+    email_id: '',
+    // password:'',
+    country_code: '',
+    phone_number: '',
+    created_date: '',
+    state: '',
+    country: '',
+    token: '',
+    id: null,
+}
+
+const initialUserWktInfo = {
+    splitProgramId: null,
+    sets: null,
+    reps: null,
+    age: null,
+    weight: null,
+    targetWt: null,
+    height: null,
+    userBMI: null,
+    userActiveSplitConfig: null,
+}
 
 export const useWktStore = create(
     persist(
         (set) => ({
-            isloginBoxShow: false,
-            toggleLoginBox: () => set((state) => ({
-                isloginBoxShow: !(state.isloginBoxShow)
-            })),
-    
-            isSignupBoxShow: false,
-            toggleSignupBox: function () {
-                set((state) => (
-                    {
-                        isSignupBoxShow: !(state.isSignupBoxShow)
-                    }
-                ))
-            },
-    
-            user_Data: {
-                user_name: '',
-                dob: '',
-                email_id: '',
-                // password:'',
-                country_code: '',
-                phone_number: '',
-                created_date: '',
-                state: '',
-                country: '',
-                token: '',
-                id: null,
-            },
+            user_Data: initialUserData,
             setUserDetails: function (value = {}) {
                 set((state) => (
                     {
@@ -38,7 +38,7 @@ export const useWktStore = create(
                     }
                 ))
             },
-    
+
             // sessionData: null,
             // set_session_data: function (value = {}) {
             //     set((state) => (
@@ -48,35 +48,33 @@ export const useWktStore = create(
             //     ))
             // },
 
-            userWktInfo:{
-                splitProgramId:null,
-                sets:null,
-                reps:null,
-                age:null,
-                weight:null,
-                targetWt:null,
-                height:null,
-                userBMI:null,
-                userActiveSplitConfig:null,
-            },
-            setUserWktInfo: function(value={}){
-                set((state)=>{
-                    const updatedWktInfo = {...state.userWktInfo, ...value};
+            userWktInfo: initialUserWktInfo,
+            setUserWktInfo: function (value = {}) {
+                set((state) => {
+                    const updatedWktInfo = { ...state.userWktInfo, ...value };
 
                     const ht = parseFloat(updatedWktInfo.height);
                     const wt = parseFloat(updatedWktInfo.weight);
 
-                    updatedWktInfo.userBMI = ht && wt ?(wt / ((ht/100) ** 2)).toFixed(1) :null;
+                    updatedWktInfo.userBMI = ht && wt ? (wt / ((ht / 100) ** 2)).toFixed(1) : null;
 
-                    return{userWktInfo: updatedWktInfo};
+                    return { userWktInfo: updatedWktInfo };
                 })
             },
+
+            resetStore: ()=>{
+                set({
+                    user_Data: initialUserData,
+                    userWktInfo: initialUserWktInfo
+                })
+            }
         }),
         {
-            name:"user_wkt_auth",
-            partialize: (state)=>({
+            name: "user_wkt_auth",
+            partialize: (state) => ({
                 user_Data: state.user_Data
-            })
+            }),
+            storage: createJSONStorage(() => sessionStorage)
         }
     )
 )

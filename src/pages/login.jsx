@@ -52,6 +52,7 @@ export default function LogIn({open}) {
 
                 setUserDetails({'token': token, 'email_id':email_id, 'phone_number':user_data[0].phone_number, 'country_code':user_data[0].country_code, 'user_name':user_data[0].user_name, 'created_date':created_at, 'id':user_data[0].id});
                 
+                navigate("/dashboard")
             }
             
         }else{

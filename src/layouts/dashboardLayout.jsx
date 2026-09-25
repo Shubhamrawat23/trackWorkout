@@ -1,8 +1,8 @@
 import React from "react";
-import Pageheader from "@/components/header";
 import { Outlet } from "react-router";
+import Pageheader from "@/components/header";
 
-export default function MainLayout() {
+export default function DashboardLayout() {
   return (
     <div className="relative h-[100dvh] w-screen overflow-hidden bg-black">
       <picture className="absolute inset-0 w-full h-full">
@@ -17,9 +17,9 @@ export default function MainLayout() {
         />
       </picture>
 
-      {/* <div className="absolute inset-0 bg-black/30" /> */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
 
-      <div className="relative z-1 h-full flex flex-col p-3">
+      <div className="relative h-full flex flex-col p-3">
         <Pageheader />
         <div className="flex-1 overflow-y-auto">
           <Outlet />
