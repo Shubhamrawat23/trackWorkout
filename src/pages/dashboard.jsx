@@ -24,7 +24,7 @@ export default function Dashboard() {
         const load = async () => {
             try {
                 const res = await wktData(userId);
-                console.log(userId);
+                console.log("Dashboard res = ",res);
 
                 if (!res.success) {
                     console.error(res.message);

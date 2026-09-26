@@ -1,6 +1,8 @@
 import React from "react";
 import { Outlet } from "react-router";
 import Pageheader from "@/components/header";
+import mobileBanner from "@/assets/mobile_banner.png";
+import desktopBanner from "@/assets/dekstop_banner.png";
 
 export default function DashboardLayout() {
   return (
@@ -8,10 +10,10 @@ export default function DashboardLayout() {
       <picture className="absolute inset-0 w-full h-full">
         <source
           media="(max-width: 640px)"
-          srcSet="src/assets/mobile_banner.png"
+          srcSet={mobileBanner}
         />
         <img
-          src="src/assets/dekstop_banner.png"
+          src={desktopBanner}
           alt="Arena"
           className="w-full h-full object-center"
         />

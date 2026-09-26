@@ -8,6 +8,7 @@ export function useWktSplitConfigInfo() {
             .from('user_split_wkt_map')
             .select(`
                 id,
+                user_id,
                 split_id,
                 is_active,
                 created_at,
@@ -42,7 +43,7 @@ export function useWktSplitConfigInfo() {
             };
         }
 
-        const { data, error } = await query.order('id', { ascending: true });
+        const { data, error } = await query.order('created_at', { ascending: false });
         console.log(data);
 
 

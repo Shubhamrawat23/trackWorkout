@@ -2,7 +2,6 @@ import SplitCard from "@/components/splitCard";
 import React from "react";
 
 export default function SplitGrid({ items = [], loading = false, onSelect }) {
-    const sorted = [...items].sort((a, b) => Number(b.is_active) - Number(a.is_active));
 
     return (
         <ul className="grid w-full max-h-full auto-rows-min grid-cols-1 items-start gap-3 overflow-y-auto p-3 xs:p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -17,7 +16,7 @@ export default function SplitGrid({ items = [], loading = false, onSelect }) {
                     </div>
                 </li>
             ) : (
-                sorted.map((item) => <SplitCard key={item.id} item={item} onSelect={onSelect} />)
+                items.map((item) => <SplitCard key={item.id} item={item} onSelect={onSelect} />)
             )}
         </ul>
     );
