@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 
 function StatBox({ label, value }) {
     return (
@@ -55,39 +56,41 @@ export default function SplitCard({ item, onSelect }) {
                     : "border-white/15 bg-black/50 " + (onSelect ? "cursor-pointer hover:bg-black/40" : ""))
             }
         >
-            <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                    <h3 className="truncate text-base font-semibold leading-tight">
-                        {split?.name ?? "Untitled split"}
-                    </h3>
-                    {split?.code && (
-                        <span className="mt-1 inline-block rounded border border-white/30 px-1 py-0.5 font-mono text-[10px] text-white/80">
-                            {split.code}
+            <Link to={`/split/${item.split.code.toLowerCase()}`} state={{map_id: item.id}}>
+                <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                        <h3 className="truncate text-base font-semibold leading-tight">
+                            {split?.name ?? "Untitled split"}
+                        </h3>
+                        {split?.code && (
+                            <span className="mt-1 inline-block rounded border border-white/30 px-1 py-0.5 font-mono text-[10px] text-white/80">
+                                {split.code}
+                            </span>
+                        )}
+                    </div>
+                    {isActive && (
+                        <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-medium text-black">
+                            Active
                         </span>
                     )}
                 </div>
-                {isActive && (
-                    <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-medium text-black">
-                        Active
-                    </span>
-                )}
-            </div>
 
-            <div className="mt-3 border-t border-white/15 pt-3">
-                {hasStats ? (
-                    <div className="grid grid-cols-3 gap-1.5">
-                        {sets != null && <StatBox label="Sets" value={sets} />}
-                        {reps != null && <StatBox label="Reps" value={reps} />}
-                        {exercises != null && <StatBox label="Exercise" value={exercises} />}
-                    </div>
-                ) : (
-                    <p className="text-xs text-white/50">No sets or reps added yet.</p>
-                )}
-            </div>
+                <div className="mt-3 border-t border-white/15 pt-3">
+                    {hasStats ? (
+                        <div className="grid grid-cols-3 gap-1.5">
+                            {sets != null && <StatBox label="Sets" value={sets} />}
+                            {reps != null && <StatBox label="Reps" value={reps} />}
+                            {exercises != null && <StatBox label="Exercise" value={exercises} />}
+                        </div>
+                    ) : (
+                        <p className="text-xs text-white/50">No sets or reps added yet.</p>
+                    )}
+                </div>
 
-            {createdAt && (
-                <p className="mt-3 truncate text-[11px] text-white/40">{createdAt}</p>
-            )}
+                {createdAt && (
+                    <p className="mt-3 truncate text-[11px] text-white/40">{createdAt}</p>
+                )}
+            </Link>
         </li>
     );
 }
