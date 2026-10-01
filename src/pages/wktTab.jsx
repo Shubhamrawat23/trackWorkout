@@ -67,6 +67,7 @@ export default function WktTab() {
                               card_title={subSplit.day_label}
                               card_desc={subSplit.day_description}
                               exe_focus_area={subSplit.target_areas}
+                              exe_label={subSplit.day_label}
                           />
                       ))}
             </div>

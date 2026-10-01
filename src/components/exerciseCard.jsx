@@ -1,6 +1,10 @@
 import React from "react";
+import { useParams } from "react-router";
+import { useNavigate } from "react-router";
 
-export default function ExerciseCard({ card_title, card_desc, exe_focus_area, isToday }) {
+export default function ExerciseCard({ card_title, card_desc, exe_focus_area, isToday, exe_label }) {
+    const navigate = useNavigate()
+    const {code} = useParams()
     return (
         <>
             <div
@@ -59,7 +63,11 @@ export default function ExerciseCard({ card_title, card_desc, exe_focus_area, is
                     </div>
 
                     <div className="mt-4">
-                        <button className={`w-full text-sm font-medium tracking-wide rounded border-1 border-gray-500 py-2 cursor-pointer relative hover:scale-105 hover:rounded-4xl hover:duration-300 hover:ease-in ${isToday? "text-black":""}`}>VIEW LOG 
+                        <button 
+                        onClick={()=>{
+                            navigate(`/split/${code}/${exe_label.toLowerCase()}`)
+                        }}
+                        className={`w-full text-sm font-medium tracking-wide rounded border-1 border-gray-500 py-2 cursor-pointer relative hover:scale-105 hover:rounded-4xl hover:duration-300 hover:ease-in ${isToday? "text-black":""}`}>VIEW LOG 
                             <i className="fa-solid fa-arrow-right fa-md absolute right-2 top-3"/>
                         </button>
                     </div>

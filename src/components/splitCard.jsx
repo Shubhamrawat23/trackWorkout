@@ -56,7 +56,7 @@ export default function SplitCard({ item, onSelect }) {
                     : "border-white/15 bg-black/50 " + (onSelect ? "cursor-pointer hover:bg-black/40" : ""))
             }
         >
-            <Link to={`/split/${item.split.code}`} state={{map_id: item.id}}>
+            <Link to={`/split/${item.split.code.toLowerCase()}`} state={{map_id: item.id}}>
                 <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                         <h3 className="truncate text-base font-semibold leading-tight">
